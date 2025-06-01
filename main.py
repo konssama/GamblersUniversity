@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from dotenv import load_dotenv
-from base import CCell
+from base import CCell, register_user, UserAlreadyRegistered
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -20,9 +20,28 @@ async def on_ready():
 
 
 @bot.event
-async def on_message(msg:discord.message.Message):
-    if msg.author.id != bot.user.id:
-        await msg.channel.send(f"yes {msg.author.mention}")
+async def on_member_join(member:discord.member.Member):
+    try:
+        register_user(member.id)
+    except UserAlreadyRegistered:
+        pass
+    print(f"{member.name} just joined the server!")
+
+
+# @bot.event
+# async def on_message(msg:discord.message.Message):
+#     if msg.author.id != bot.user.id:
+#         await msg.channel.send(f"yes {msg.author.mention}")
+
+
+@bot.tree.command(name="register", description="Κάνε register τον εαυτό σου σε περίπτωση που μπήκες στον server όταν το bot ήταν κλειστό")
+async def register(interaction:discord.Interaction):
+    try:
+        register_user(interaction.user.id)
+        await interaction.response.send_message(f"Οκ τώρα είσαι αποθηκευμένος {interaction.user.mention}")
+    except UserAlreadyRegistered:
+        await interaction.response.send_message(f"Ήσουν ήδη αποθηκευμένος {interaction.user.mention}")
+
 
 
 @bot.tree.command(name="coinflip", description="Double or nothing for your money")
