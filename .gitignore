@@ -1,0 +1,5 @@
+secrets
+secrets/sheets_api.json
+.env
+
+*__pycache__
