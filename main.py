@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from dotenv import load_dotenv
-from base import CCell, register_user, UserAlreadyRegistered
+from base import CCell, register_user, UserAlreadyRegistered, generate_user_objects, get_user
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -43,6 +43,11 @@ async def register(interaction:discord.Interaction):
         await interaction.response.send_message(f"Ήσουν ήδη αποθηκευμένος {interaction.user.mention}")
 
 
+@bot.tree.command(name="balance", description="Δες πόσα χρήματα έχεις")
+async def register(interaction:discord.Interaction):
+    user = get_user(interaction.user.id)
+    await interaction.response.send_message(user.balance.get_float())
+
 
 @bot.tree.command(name="coinflip", description="Double or nothing for your money")
 async def coinflip(interaction:discord.Interaction):
@@ -50,4 +55,5 @@ async def coinflip(interaction:discord.Interaction):
     await interaction.response.send_message(f"yo {username}")
 
 
+generate_user_objects()
 bot.run(TOKEN)
