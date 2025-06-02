@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from dotenv import load_dotenv
-from base import CCell, register_user, UserAlreadyRegistered, generate_user_objects, get_user
+from classes.sheets import CCell, register_user, UserAlreadyRegistered, generate_user_objects, get_user
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -45,6 +45,16 @@ async def register(interaction:discord.Interaction):
 
 @bot.tree.command(name="balance", description="Δες πόσα χρήματα έχεις")
 async def register(interaction:discord.Interaction):
+    stocks = {
+        "TSL": 30,
+        "CUM": 2,
+        "MAGA": 9,
+        "ELONMA": 12
+    }
+    cell = CCell(6,2)
+    cell.set(stocks)
+    print(cell.get_dict())
+
     user = get_user(interaction.user.id)
     await interaction.response.send_message(user.balance.get_float())
 
