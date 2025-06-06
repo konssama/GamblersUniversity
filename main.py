@@ -3,7 +3,10 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from dotenv import load_dotenv
-from classes.sheets import CCell, register_user, UserAlreadyRegistered, generate_user_objects, get_user
+from classes.sheets import CCell
+from classes.user import register_user, get_user, generate_user_objects, UserAlreadyRegistered
+from datetime import datetime
+import random
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -44,25 +47,34 @@ async def register(interaction:discord.Interaction):
 
 
 @bot.tree.command(name="balance", description="Δες πόσα χρήματα έχεις")
-async def register(interaction:discord.Interaction):
-    stocks = {
-        "TSL": 30,
-        "CUM": 2,
-        "MAGA": 9,
-        "ELONMA": 12
-    }
-    cell = CCell(6,2)
-    cell.set(stocks)
-    print(cell.get_dict())
-
+async def balance(interaction:discord.Interaction):
     user = get_user(interaction.user.id)
     await interaction.response.send_message(user.balance.get_float())
 
 
-@bot.tree.command(name="coinflip", description="Double or nothing for your money")
-async def coinflip(interaction:discord.Interaction):
-    username = interaction.user.id
-    await interaction.response.send_message(f"yo {username}")
+@bot.tree.command(name="cashout", description="Πάρε ό,τι λεφτά έχει μαζέψει το mining")
+async def cashout(interaction:discord.Interaction):
+    user = get_user(interaction.user.id)
+    user.last_cashout.set(datetime.now().replace(microsecond=0))
+    print(user.last_cashout.get_time())
+
+    await interaction.response.send_message(user.balance.get_float())
+
+
+@bot.tree.command(name="coinflip", description="Διπλά ή τίποτα σε ό,τι βάλεις")
+async def coinflip(interaction:discord.Interaction, amount:float):
+    user = get_user(interaction.id)
+    print(random.randrange(0,2))
+    if amount > user.balance.get_float():
+        await interaction.response.send_message(f"Μπρο δεν έχεις {amount}€")
+        return
+
+    if random.randrange(0,2) == 0:
+        user.balance.set(user.balance.get_float() + amount*2)
+        await interaction.response.send_message(f"Κέρδισες {amount*2}€")
+    else:
+        user.balance.set(user.balance.get_float() - amount)
+        await interaction.response.send_message(f"Έχασες {amount}€")
 
 
 generate_user_objects()
