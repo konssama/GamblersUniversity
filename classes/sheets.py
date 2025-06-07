@@ -1,11 +1,13 @@
-from oauth2client.service_account import ServiceAccountCredentials
-import gspread
-import os
 import ast
+import os
 from datetime import datetime
 from typing import Final
 
-SHEET_NAME = os.getenv("SHEET_NAME")
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
+is_prod = True if os.getenv("ENV") == "PROD" else False
+SHEET_NAME = os.getenv("SHEET_NAME_PROD") if is_prod else os.getenv("SHEET_NAME_TEST")
 
 SCOPES: Final = [
     "https://www.googleapis.com/auth/spreadsheets",

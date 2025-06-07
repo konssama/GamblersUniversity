@@ -1,12 +1,19 @@
 import os
-import discord
-from discord.ext import commands
-from discord import app_commands
-from dotenv import load_dotenv
-from classes.sheets import CCell
-from classes.user import register_user, get_user, generate_user_objects, UserAlreadyRegistered
-from datetime import datetime
 import random
+from datetime import datetime
+
+import discord
+# from discord import app_commands
+from discord.ext import commands
+from dotenv import load_dotenv
+
+# from classes.sheets import CCell
+from classes.user import (
+    UserAlreadyRegistered,
+    generate_user_objects,
+    get_user,
+    register_user,
+)
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")

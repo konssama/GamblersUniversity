@@ -1,5 +1,7 @@
-from classes.sheets import CCell, get_all_ids
 from datetime import datetime
+
+from classes.sheets import CCell, get_all_ids
+
 
 class User:
     def __init__(self, user_id:int, is_new:bool=False):
@@ -9,18 +11,18 @@ class User:
         row = ids.index(str(user_id)) + 1
 
         self.balance = CCell(row, 2)
-        if is_new: self.balance.set(0)
-
         self.last_cashout = CCell(row, 3)
-        if is_new: self.last_cashout.set(datetime.now().replace(microsecond=0))
-
         self.gpu_count = CCell(row, 4)
-        if is_new: self.gpu_count = 0
+
+        if is_new:
+            self.balance.set(0)
+            self.last_cashout.set(datetime.now().replace(microsecond=0))
+            self.gpu_count = 0
 
 
 def register_user(user_id:int):
     ids = get_all_ids()
-    if not str(user_id) in ids:
+    if str(user_id) not in ids:
         temp_cell = CCell(len(ids)+1, 1)
         temp_cell.set(user_id)
         all_users.append(User(user_id, is_new=True))

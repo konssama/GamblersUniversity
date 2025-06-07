@@ -2,4 +2,6 @@ secrets
 secrets/sheets_api.json
 .env
 
+.vscode
 *__pycache__
+.ruff_cache
