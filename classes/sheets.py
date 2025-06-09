@@ -60,28 +60,32 @@ def pop_get_queue() -> list:
     types = []
 
     # translate _get_queue pairs in a [A1,B12] cell notation cause that's what batch_get() wants
-    for row, col, value_type in _get_queue:  # noqa: F823 ignore error this will have been created by generate_call_queues() at the start
+    for row, col, value_type in _get_queue:
         cell = gspread.utils.rowcol_to_a1(row, col)
         cells.append(cell)
         types.append(value_type)
 
-    _get_queue = []
-    str_values = VARIABLES.batch_get(cells)
+    _get_queue.clear()
+    response = VARIABLES.batch_get(cells)
 
     parsed_values = []
-    for i in range(len(str_values)):
-        parsed_values.append(type_parse(types[i], str_values[i]))
+    for i in range(len(response)):
+        # weird ahh syntax cause batch_get returns things as [[['0']], [['2025-06-09 20:27:49']]]
+        parsed_values.append(type_parse(types[i], response[i][0][0]))
 
     return parsed_values
 
 
 def push_set_queue():
     batch_data = []
-    for row, col, value in _set_queue:  # noqa: F823 ignore error this will have been created by generate_call_queues() at the start
-        new_dict = {"range": gspread.utils.rowcol_to_a1(row, col), "values": [[value]]}
+    for row, col, value in _set_queue:
+        new_dict = {
+            "range": gspread.utils.rowcol_to_a1(row, col),
+            "values": [[str(value)]],
+        }
         batch_data.append(new_dict)
 
-    _set_queue = []
+    _set_queue.clear()
     VARIABLES.batch_update(batch_data)
 
 
