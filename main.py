@@ -55,11 +55,11 @@ async def register(interaction: discord.Interaction):
 
     try:
         register_user(interaction.user.id)
-        await interaction.response.send_message(
+        await interaction.followup.send(
             f"Οκ τώρα είσαι αποθηκευμένος {interaction.user.mention}"
         )
     except UserAlreadyRegistered:
-        await interaction.response.send_message(
+        await interaction.followup.send(
             f"Ήσουν ήδη αποθηκευμένος {interaction.user.mention}"
         )
 
@@ -69,7 +69,7 @@ async def balance(interaction: discord.Interaction):
     await interaction.response.defer()
 
     user = get_user(interaction.user.id)
-    await interaction.response.send_message(user.balance.get())
+    await interaction.followup.send(user.balance.get())
 
 
 @bot.tree.command(name="cashout", description="Πάρε ό,τι λεφτά έχει μαζέψει το mining")
@@ -78,8 +78,8 @@ async def cashout(interaction: discord.Interaction):
 
     user = get_user(interaction.user.id)
 
-    user.balance.add_to_get()
-    user.last_cashout.add_to_get()
+    user.balance.queue_value()
+    user.last_cashout.queue_value()
     current_balance, old_time = pop_get_queue()
 
     new_time: datetime = datetime.now().replace(microsecond=0)
@@ -90,7 +90,7 @@ async def cashout(interaction: discord.Interaction):
     user.last_cashout.next_value(new_time)
     push_set_queue()
 
-    await interaction.response.send_message(f"{current_balance}")
+    await interaction.followup.send(f"{current_balance}")
 
 
 @bot.tree.command(name="coinflip", description="Διπλά ή τίποτα σε ό,τι βάλεις")
@@ -100,15 +100,15 @@ async def coinflip(interaction: discord.Interaction, amount: float):
     user = get_user(interaction.id)
     current_balance = user.balance.get()
     if amount > current_balance:
-        await interaction.response.send_message(f"Μπρο δεν έχεις {amount}€")
+        await interaction.followup.send(f"Μπρο δεν έχεις {amount}€")
         return
 
     if random.randrange(0, 2) == 0:
         user.balance.set(current_balance + amount * 2)
-        await interaction.response.send_message(f"Κέρδισες {amount * 2}€")
+        await interaction.followup.send(f"Κέρδισες {amount * 2}€")
     else:
         user.balance.set(current_balance - amount)
-        await interaction.response.send_message(f"Έχασες {amount}€")
+        await interaction.followup.send(f"Έχασες {amount}€")
 
 
 if __name__ == "__main__":
