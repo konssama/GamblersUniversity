@@ -4,11 +4,15 @@ from classes.sheets import CCell, get_all_ids
 
 
 class User:
-    def __init__(self, user_id:int, is_new:bool=False):
+    def __init__(self, user_id: int, is_new: bool = False, id_cache: list = []):
         self.user_id = user_id
 
-        ids = get_all_ids()
-        row = ids.index(str(user_id)) + 1
+        if len(id_cache) == 0:
+            ids = get_all_ids()
+            row = ids.index(str(user_id)) + 1
+        else:  # when creating the heap of objects in mass we can get the ids in one call and pass them for easy access
+            ids = id_cache
+            row = ids.index(str(user_id)) + 1
 
         self.balance = CCell(row, 2)
         self.last_cashout = CCell(row, 3)
@@ -20,10 +24,10 @@ class User:
             self.gpu_count = 0
 
 
-def register_user(user_id:int):
+def register_user(user_id: int):
     ids = get_all_ids()
     if str(user_id) not in ids:
-        temp_cell = CCell(len(ids)+1, 1)
+        temp_cell = CCell(len(ids) + 1, 1)
         temp_cell.set(user_id)
         _all_users.append(User(user_id, is_new=True))
     else:
@@ -35,7 +39,7 @@ def generate_user_objects():
     _all_users = []
     ids = get_all_ids()
     for id in ids:
-        _all_users.append(User(id))
+        _all_users.append(User(id, id_cache=ids))
 
 
 def get_user(key_id) -> User:
@@ -44,8 +48,10 @@ def get_user(key_id) -> User:
             return user
     return None
 
+
 def get_all_users():
     return _all_users
+
 
 class UserAlreadyRegistered(Exception):
     def __init__(self, *args):
