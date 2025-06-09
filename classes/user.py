@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from classes.sheets import CCell, get_all_ids
+from classes.sheets import CCell, get_all_ids, push_set_queue
 
 
 class User:
@@ -14,22 +14,22 @@ class User:
             ids = id_cache
             row = ids.index(str(user_id)) + 1
 
-        self.balance = CCell(row, 2)
-        self.last_cashout = CCell(row, 3)
-        self.gpu_count = CCell(row, 4)
+        self.balance = CCell("float", row, 2)
+        self.last_cashout = CCell("datetime", row, 3)
+        self.gpu_count = CCell("int", row, 4)
 
-        if is_new:
+        if is_new:  # % make batch set optimization after testing that it works
             self.balance.set(0)
             self.last_cashout.set(datetime.now().replace(microsecond=0))
-            self.gpu_count = 0
+            self.gpu_count.set(0)
 
 
 def register_user(user_id: int):
     ids = get_all_ids()
     if str(user_id) not in ids:
-        temp_cell = CCell(len(ids) + 1, 1)
+        temp_cell = CCell("int", len(ids) + 1, 1)
         temp_cell.set(user_id)
-        _all_users.append(User(user_id, is_new=True))
+        _all_users.append(User(user_id, is_new=True, id_cache=ids))
     else:
         raise UserAlreadyRegistered
 
