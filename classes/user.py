@@ -25,25 +25,27 @@ def register_user(user_id:int):
     if str(user_id) not in ids:
         temp_cell = CCell(len(ids)+1, 1)
         temp_cell.set(user_id)
-        all_users.append(User(user_id, is_new=True))
+        _all_users.append(User(user_id, is_new=True))
     else:
         raise UserAlreadyRegistered
 
 
 def generate_user_objects():
-    global all_users
-    all_users = [] # * νομίζω δέν δουλεύει σωστά
+    global _all_users
+    _all_users = []
     ids = get_all_ids()
     for id in ids:
-        all_users.append(User(id))
+        _all_users.append(User(id))
 
 
 def get_user(key_id) -> User:
-    for user in all_users:
+    for user in _all_users:
         if str(user.user_id) == str(key_id):
             return user
     return None
 
+def get_all_users():
+    return _all_users
 
 class UserAlreadyRegistered(Exception):
     def __init__(self, *args):

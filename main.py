@@ -13,6 +13,7 @@ from classes.user import (
     generate_user_objects,
     get_user,
     register_user,
+    get_all_users,
 )
 
 load_dotenv()
@@ -31,7 +32,7 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member:discord.member.Member):
-    try:
+    try: # !FIXME
         register_user(member.id)
     except UserAlreadyRegistered:
         pass
@@ -55,6 +56,7 @@ async def register(interaction:discord.Interaction):
 
 @bot.tree.command(name="balance", description="Δες πόσα χρήματα έχεις")
 async def balance(interaction:discord.Interaction):
+    print(get_all_users())
     user = get_user(interaction.user.id)
     await interaction.response.send_message(user.balance.get_float())
 

@@ -2,10 +2,11 @@ import ast
 import os
 from datetime import datetime
 from typing import Final
-
+from dotenv import load_dotenv
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+load_dotenv()
 is_prod = True if os.getenv("ENV") == "PROD" else False
 SHEET_NAME = os.getenv("SHEET_NAME_PROD") if is_prod else os.getenv("SHEET_NAME_TEST")
 
