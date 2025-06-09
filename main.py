@@ -97,7 +97,7 @@ async def cashout(interaction: discord.Interaction):
 async def coinflip(interaction: discord.Interaction, amount: float):
     await interaction.response.defer()
 
-    user = get_user(interaction.id)
+    user = get_user(interaction.user.id)
     current_balance = user.balance.get()
     if amount > current_balance:
         await interaction.followup.send(f"Μπρο δεν έχεις {amount}€")

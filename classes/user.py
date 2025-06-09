@@ -18,10 +18,11 @@ class User:
         self.last_cashout = CCell("datetime", row, 3)
         self.gpu_count = CCell("int", row, 4)
 
-        if is_new:  # % make batch set optimization after testing that it works
-            self.balance.set(0)
-            self.last_cashout.set(datetime.now().replace(microsecond=0))
-            self.gpu_count.set(0)
+        if is_new:
+            self.balance.next_value(0)
+            self.last_cashout.next_value(datetime.now().replace(microsecond=0))
+            self.gpu_count.next_value(0)
+            push_set_queue()
 
 
 def register_user(user_id: int):
