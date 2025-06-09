@@ -32,17 +32,20 @@ def get_all_ids() -> list:
 
 
 def type_parse(value_type, value):
-    match value_type:
-        case "str":
-            return value
-        case "float":
-            return float(value)
-        case "int":
-            return int(value)
-        case "dict":
-            return ast.literal_eval(value)
-        case "datetime":
-            return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+    try:
+        match value_type:
+            case "str":
+                return value
+            case "float":
+                return float(value)
+            case "int":
+                return int(value)
+            case "dict":
+                return ast.literal_eval(value)
+            case "datetime":
+                return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        print(f"Cell error: Tried to push value {value} to a cell of type {value_type}")
 
 
 def generate_call_queues():
