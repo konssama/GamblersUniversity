@@ -74,7 +74,7 @@ def pop_get_queue() -> list:
 
 def push_set_queue():
     batch_data = []
-    for row, col, value in _set_queue:
+    for row, col, value in _set_queue:  # noqa: F823 ignore error this will have been created by generate_call_queues() at the start
         new_dict = {"range": gspread.utils.rowcol_to_a1(row, col), "values": [[value]]}
         batch_data.append(new_dict)
 
