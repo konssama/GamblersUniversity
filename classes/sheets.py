@@ -37,7 +37,7 @@ def type_parse(value_type, value):
             case "str":
                 return value
             case "float":
-                return float(value)
+                return round(float(value), 2)
             case "int":
                 return int(value)
             case "dict":
@@ -79,6 +79,11 @@ def pop_get_queue() -> list:
 def push_set_queue():
     batch_data = []
     for row, col, value in _set_queue:
+        try:  # round floats
+            value = round(float(str(value)), 2)
+        except ValueError:
+            pass
+
         new_dict = {
             "range": gspread.utils.rowcol_to_a1(row, col),
             "values": [[str(value)]],
@@ -106,6 +111,10 @@ class CCell:
         _set_queue.append([self.row, self.col, value])
 
     def set(self, value: str | float | int | dict | datetime):
+        try:  # round floats
+            value = round(float(str(value)), 2)
+        except ValueError:
+            pass
         VARIABLES.update_cell(self.row, self.col, str(value))
 
     def get(self) -> str | float | int | dict | datetime:

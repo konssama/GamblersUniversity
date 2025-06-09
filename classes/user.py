@@ -9,9 +9,12 @@ class User:
 
         if len(id_cache) == 0:
             ids = get_all_ids()
-            row = ids.index(str(user_id)) + 1
         else:  # when creating the heap of objects in mass we can get the ids in one call and pass them for easy access
             ids = id_cache
+
+        if is_new:
+            row = len(ids)
+        else:
             row = ids.index(str(user_id)) + 1
 
         self.balance = CCell("float", row, 2)
@@ -21,7 +24,7 @@ class User:
         if is_new:
             self.balance.next_value(0)
             self.last_cashout.next_value(datetime.now().replace(microsecond=0))
-            self.gpu_count.next_value(0)
+            self.gpu_count.next_value(1)
             push_set_queue()
 
 
@@ -30,7 +33,7 @@ def register_user(user_id: int):
     if str(user_id) not in ids:
         temp_cell = CCell("int", len(ids) + 1, 1)
         temp_cell.set(user_id)
-        _all_users.append(User(user_id, is_new=True, id_cache=ids))
+        _all_users.append(User(user_id, is_new=True))
     else:
         raise UserAlreadyRegistered
 
