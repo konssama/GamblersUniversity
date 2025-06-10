@@ -3,6 +3,7 @@ import random
 from datetime import datetime
 import time
 import discord
+from classes.menus import BuyMenu
 
 # from discord import app_commands
 from discord.ext import commands
@@ -109,6 +110,17 @@ async def coinflip(interaction: discord.Interaction, amount: float):
     else:
         user.balance.set(current_balance - amount)
         await interaction.followup.send(f"Έχασες {amount}€")
+
+
+@bot.tree.command(name="debug", description="Debug Info")
+@commands.has_role("Admin")
+async def debug(interaction: discord.Interaction):
+    await interaction.response.defer()
+
+    embed = discord.Embed(title="Αγορές", description="", color=0x328FF2)
+    view = BuyMenu(get_user(interaction.user.id))
+
+    await interaction.followup.send(embed=embed, view=view)
 
 
 if __name__ == "__main__":
