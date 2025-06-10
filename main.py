@@ -120,7 +120,7 @@ async def coinflip(interaction: discord.Interaction, amount: float):
 async def debug(interaction: discord.Interaction):
     await interaction.response.defer()
 
-    embed = discord.Embed(title="Αγορές", description="", color=0x328FF2)
+    embed = discord.Embed(title="Αγορές", description="Μέσο Lidl", color=0x328FF2)
     view = BuyMenu(get_user(interaction.user.id))
 
     await interaction.followup.send(embed=embed, view=view)
