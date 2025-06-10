@@ -39,7 +39,8 @@ def type_parse(value_type, value):
             case "float":
                 return round(float(value), 2)
             case "int":
-                return int(value)
+                # doing this weird two part cast cause int(value) raised a ValueError
+                return int(round(float(value), 2))
             case "dict":
                 return ast.literal_eval(value)
             case "datetime":

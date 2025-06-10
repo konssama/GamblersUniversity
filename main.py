@@ -81,12 +81,15 @@ async def cashout(interaction: discord.Interaction):
 
     user.balance.queue_value()
     user.last_cashout.queue_value()
-    current_balance, old_time = pop_get_queue()
+    user.gpu_count.queue_value()
+    current_balance, old_time, gpu_count = pop_get_queue()
 
     new_time: datetime = datetime.now().replace(microsecond=0)
     diff = (new_time - old_time).total_seconds()
 
-    current_balance += diff * 0.4
+    current_balance += diff * gpu_count * 0.06
+    current_balance = round(current_balance, 2)
+
     user.balance.next_value(current_balance)
     user.last_cashout.next_value(new_time)
     push_set_queue()

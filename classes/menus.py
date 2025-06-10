@@ -47,8 +47,6 @@ class GpuMenu(discord.ui.View):
         self.user.balance.queue_value()
         gpus, current_balance = pop_get_queue()
 
-        print(gpus, current_balance)
-
         if gpu_price > current_balance:
             await interaction.response.edit_message(
                 embed=discord.Embed(title="Δεν έχεις αρκετά χρήματα", color=0x328FF2),
@@ -58,6 +56,15 @@ class GpuMenu(discord.ui.View):
 
         gpus += 1
         current_balance -= gpu_price
+
+        if gpus > 10:
+            await interaction.response.edit_message(
+                embed=discord.Embed(
+                    title="Μπορείς να έχεις μόνο μέχρι 10 gpu", color=0x328FF2
+                ),
+                view=None,
+            )
+            return  # return without pushing to database
 
         self.user.gpu_count.next_value(gpus)
         self.user.balance.next_value(current_balance)
