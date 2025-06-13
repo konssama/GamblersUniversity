@@ -27,11 +27,11 @@ DATA: Final = CLIENT.open(SHEET_NAME)
 VARIABLES: Final = DATA.get_worksheet(0)
 
 
-def get_all_ids() -> list:
+def get_all_ids() -> list[str]:
     return VARIABLES.col_values(1)
 
 
-def type_parse(value_type, value):
+def type_parse(value_type: str, value: str):
     try:
         match value_type:
             case "str":
@@ -57,8 +57,8 @@ def generate_call_queues():
 
 
 def pop_get_queue() -> list:
-    cells = []
-    types = []
+    cells: list[str] = []  # cell coords in C9 format
+    types: list[str] = []  # type[i] is the intended type for cells[i]
 
     # translate _get_queue pairs in a [A1,B12] cell notation cause that's what batch_get() wants
     for row, col, value_type in _get_queue:
@@ -80,15 +80,14 @@ def pop_get_queue() -> list:
 def push_set_queue():
     batch_data = []
     for row, col, value in _set_queue:
-        try:  # round floats
-            value = round(float(str(value)), 2)
-        except ValueError:
-            pass
+        if value is float:
+            value = round(value, 2)
 
         new_dict = {
             "range": gspread.utils.rowcol_to_a1(row, col),
             "values": [[str(value)]],
         }
+
         batch_data.append(new_dict)
 
     _set_queue.clear()
@@ -100,24 +99,23 @@ class CCell:
         if value_type in ["str", "float", "int", "dict", "datetime"]:
             self.value_type = value_type
         else:
-            print(f"{value_type} is not a recognized type")
+            print(f"Cell {row},{col}: {value_type} is not a recognized type")
 
         self.row = row
         self.col = col
 
-    def queue_value(self):
-        _get_queue.append([self.row, self.col, self.value_type])
-
-    def next_value(self, value):
-        _set_queue.append([self.row, self.col, value])
-
     def set(self, value: str | float | int | dict | datetime):
-        try:  # round floats
-            value = round(float(str(value)), 2)
-        except ValueError:
-            pass
+        if value is float:
+            value = round(value, 2)
+
         VARIABLES.update_cell(self.row, self.col, str(value))
 
     def get(self) -> str | float | int | dict | datetime:
         value = VARIABLES.cell(self.row, self.col).value.strip()
         return type_parse(self.value_type, value)
+
+    def next_value(self, value):
+        _set_queue.append([self.row, self.col, value])
+
+    def queue_value(self):
+        _get_queue.append([self.row, self.col, self.value_type])

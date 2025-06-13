@@ -15,6 +15,7 @@ from classes.user import (
     generate_user_objects,
     get_user,
     register_user,
+    get_all_users,
 )
 
 load_dotenv()
@@ -36,6 +37,7 @@ async def on_ready():
 async def on_member_join(member: discord.member.Member):
     try:  # !FIXME
         register_user(member.id)
+        # register_user(member._user.id)  # % _user may be a fix? not tested
     except UserAlreadyRegistered:
         pass
     print(f"{member.name} just joined the server!")
@@ -87,14 +89,15 @@ async def cashout(interaction: discord.Interaction):
     new_time: datetime = datetime.now().replace(microsecond=0)
     diff = (new_time - old_time).total_seconds()
 
-    current_balance += diff * gpu_count * 0.06
+    gain = round(diff * gpu_count * 0.06, 2)
+    current_balance += gain
     current_balance = round(current_balance, 2)
 
     user.balance.next_value(current_balance)
     user.last_cashout.next_value(new_time)
     push_set_queue()
 
-    await interaction.followup.send(f"{current_balance}")
+    await interaction.followup.send(f"+{gain}€ Σύνολο: {current_balance}€")
 
 
 @bot.tree.command(name="coinflip", description="Διπλά ή τίποτα σε ό,τι βάλεις")

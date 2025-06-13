@@ -13,7 +13,7 @@ class BuyMenu(discord.ui.View):
     async def gpu(self, interaction: discord.Interaction, button: discord.ui.Button):
         embed = discord.Embed(
             title="GPUs",
-            description="Αγόρασε GPUs για περισσότερο mining.",
+            description="Αγόρασε GPUs για περισσότερο mining. 100€/gpu.",
             color=0x328FF2,
         )
         view = GpuMenu(self.user)
@@ -32,13 +32,19 @@ class BuyMenu(discord.ui.View):
     async def on_timeout(self):
         # !FIXME claude hallucinated item.disabled
         for item in self.children:
-            item.disabled = True
+            # item.disabled = True
+            pass
+
+            # self.clear_items()  # % maybe this is the method we need?
+            # * WARNING also this should probably be in all View subclasses cause View's on_timeout() just passes?
+            # bro i have 3 comments in 3 lines of code that do nothing smh,
+            # that's what i get for vibe coding
 
 
 class GpuMenu(IntegerButtonView):
     def __init__(self, user: User):
         self.user: User = user
-        super().__init__([1, 2, 5])  # Menu expires after 180 seconds
+        super().__init__([1, 2, 5])
 
     def on_click(self, amount: int) -> str:
         gpu_price = 100.0
