@@ -1,21 +1,21 @@
 import os
 import random
-from datetime import datetime
 import time
+
 import discord
-from classes.menus import BuyMenu
 
 # from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
-from classes.sheets import generate_call_queues, push_set_queue, pop_get_queue
+from classes.menus import BuyMenu
+from classes.sheets import generate_call_queues, pop_get_queue, push_set_queue
+from classes.time_module import get_timestamp, schedule_time, calc_time_difference
 from classes.user import (
     UserAlreadyRegistered,
     generate_user_objects,
     get_user,
     register_user,
-    get_all_users,
 )
 
 load_dotenv()
@@ -30,6 +30,9 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 @bot.event
 async def on_ready():
     await bot.tree.sync()  # show bot / commands to the server commands
+
+    # daily_task.start()
+
     print(f"{bot.user} is online")
 
 
@@ -47,6 +50,14 @@ async def on_member_join(member: discord.member.Member):
 # async def on_message(msg:discord.message.Message):
 #     if msg.author.id != bot.user.id:
 #         await msg.channel.send(f"yes {msg.author.mention}")
+
+
+# @tasks.loop(time=schedule_time(13, 34))
+# async def daily_task():
+#     print(f"Daily task executed at {get_timestamp()}")
+#     channel = bot.get_channel("id_int_removed")
+#     if channel:
+#         await channel.send("msg")
 
 
 @bot.tree.command(
@@ -86,8 +97,8 @@ async def cashout(interaction: discord.Interaction):
     user.gpu_count.queue_value()
     current_balance, old_time, gpu_count = pop_get_queue()
 
-    new_time: datetime = datetime.now().replace(microsecond=0)
-    diff = (new_time - old_time).total_seconds()
+    new_time = get_timestamp()
+    diff = calc_time_difference(old_time, new_time)
 
     gain = round(diff * gpu_count * 0.06, 2)
     current_balance += gain
@@ -118,15 +129,20 @@ async def coinflip(interaction: discord.Interaction, amount: float):
         await interaction.followup.send(f"Έχασες {amount}€")
 
 
-@bot.tree.command(name="debug", description="Debug Info")
-@commands.has_role("Admin")
-async def debug(interaction: discord.Interaction):
+@bot.tree.command(name="buy", description="Κάνε αγορές")
+async def buy(interaction: discord.Interaction):
     await interaction.response.defer()
 
     embed = discord.Embed(title="Αγορές", description="Μέσο Lidl", color=0x328FF2)
     view = BuyMenu(get_user(interaction.user.id))
 
     await interaction.followup.send(embed=embed, view=view)
+
+
+@bot.tree.command(name="debug", description="Debug Info")
+@commands.has_role("Admin")
+async def debug(interaction: discord.Interaction):
+    await interaction.response.send_message("pp")
 
 
 if __name__ == "__main__":

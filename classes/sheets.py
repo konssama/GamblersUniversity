@@ -2,8 +2,9 @@ import ast
 import os
 from datetime import datetime
 from typing import Final
-from dotenv import load_dotenv
+
 import gspread
+from dotenv import load_dotenv
 from oauth2client.service_account import ServiceAccountCredentials
 
 load_dotenv()
@@ -44,9 +45,9 @@ def type_parse(value_type: str, value: str):
             case "dict":
                 return ast.literal_eval(value)
             case "datetime":
-                return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+                return datetime.strptime(value, "%Y-%m-%d %H:%M:%S%z")
     except ValueError:
-        print(f"Cell error: Tried to push value {value} to a cell of type {value_type}")
+        print(f"Cell error: Tried to read value {value} as a {value_type}")
 
 
 def generate_call_queues():

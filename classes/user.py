@@ -1,6 +1,5 @@
-from datetime import datetime
-
 from classes.sheets import CCell, get_all_ids, push_set_queue
+from classes.time_module import get_timestamp
 
 
 class User:
@@ -33,7 +32,7 @@ class User:
 
         if is_new:
             self.balance.next_value(0)
-            self.last_cashout.next_value(datetime.now().replace(microsecond=0))
+            self.last_cashout.next_value(get_timestamp())
             self.gpu_count.next_value(1)
             push_set_queue()
 
