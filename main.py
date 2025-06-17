@@ -21,6 +21,7 @@ from library.user import (
     generate_user_objects,
     get_user,
     register_user,
+    get_all_users_sorted,
 )
 
 load_dotenv()
@@ -161,6 +162,25 @@ async def buy(interaction: discord.Interaction):
     view = BuyMenu(get_user(interaction.user.id))
 
     await interaction.followup.send(embed=embed, view=view)
+
+
+@bot.tree.command(name="leaderboard", description="Δες τις κατατάξεις")
+async def leaderboard(interaction: discord.Interaction):
+    await interaction.response.defer()
+
+    users = get_all_users_sorted()
+    for user in users:
+        user.balance.queue_value()
+
+    balances = pop_get_queue()
+
+    print_str = ""
+
+    for i in range(len(users)):
+        print_str += f"{i + 1}. {users[i].name}: {balances[i]}€\n"
+
+    embed = discord.Embed(title="Leaderboard", description=print_str, color=0x328FF2)
+    await interaction.followup.send(embed=embed)
 
 
 @bot.tree.command(name="debug", description="Debug Info")

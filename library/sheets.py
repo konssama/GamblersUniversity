@@ -59,7 +59,7 @@ def generate_call_queues():
 
 def pop_get_queue() -> list:
     if len(_get_queue) == 0:
-        return
+        return []
 
     cells: list[str] = []  # cell coords in C9 format
     types: list[str] = []  # type[i] is the intended type for cells[i]

@@ -1,4 +1,4 @@
-from library.sheets import CCell, get_all_ids, push_set_queue
+from library.sheets import CCell, get_all_ids, push_set_queue, pop_get_queue
 from library.time_module import get_timestamp
 
 
@@ -96,8 +96,36 @@ def get_user(key_id: int) -> User:
     return None
 
 
-def get_all_users():
+def get_all_users() -> list[User]:
     return _all_users
+
+
+def get_all_users_sorted(key: str) -> list[User]:
+    """
+    Parameters
+    -----------
+    key: :class:`str`
+        Sort users based on:
+        `"balance"`
+    """
+    users = get_all_users()
+
+    match key:
+        case "balance":
+            for user in users:
+                user.balance.queue_value()
+
+            sorting_list = pop_get_queue()
+
+        case _:
+            print(f"sort type: {key} not found. returning unsorted list")
+
+    # some actual chicanery claude did to sort both lists together by key
+    # you can't tell me python is readable smh
+    sorted_pairs = sorted(zip(users, sorting_list), key=lambda x: x[1], reverse=True)
+    sorted_users = [pair[0] for pair in sorted_pairs]
+
+    return sorted_users
 
 
 class UserAlreadyRegistered(Exception):
