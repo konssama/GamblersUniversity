@@ -26,6 +26,12 @@ from library.user import (
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
+is_prod = True if os.getenv("ENV") == "PROD" else False
+TOKEN = (
+    os.getenv("REAL_BOT_DISCORD_TOKEN")
+    if is_prod
+    else os.getenv("TEST_BOT_DISCORD_TOKEN")
+)
 
 intents = discord.Intents.default()
 intents.members = True
