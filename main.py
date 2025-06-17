@@ -12,6 +12,7 @@ from library.sheets import (
     generate_call_queues,
     pop_get_queue,
     push_set_queue,
+    get_all_ids,
 )
 from library.time_module import get_timestamp, schedule_time, calc_time_difference
 from library.user import (
@@ -182,6 +183,21 @@ async def leaderboard(interaction: discord.Interaction):
 
     embed = discord.Embed(title="Leaderboard", description=print_str, color=0x328FF2)
     await interaction.followup.send(embed=embed)
+
+
+@bot.tree.command(name="debug_me", description="Δείξε debug info")
+async def debug_me(interaction: discord.Interaction):
+    await interaction.response.defer()
+    debug_str = ""
+    debug_str += f"Discord ID: {interaction.user.id}\n"
+    debug_str += f"Discord name: {interaction.user.name}\n"
+    if str(interaction.user.id) in get_all_ids():
+        debug_str += "User is in sheets\n"
+    else:
+        debug_str += "User is not in sheets\n"
+    debug_str += f"Channel ID: {interaction.channel_id}\n"
+    debug_str += f"Guild ID: {interaction.guild_id}\n"
+    await interaction.followup.send(debug_str)
 
 
 @bot.tree.command(name="debug", description="Debug Info")
