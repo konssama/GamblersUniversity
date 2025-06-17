@@ -28,7 +28,7 @@ load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 intents = discord.Intents.default()
-# intents.members = True # !FIXME add members permission in dev portal
+intents.members = True
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
@@ -45,9 +45,8 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member: discord.member.Member):
-    try:  # !FIXME need to add members intent in the discord developers website
+    try:
         register_user(member.id, member.name)
-        # register_user(member._user.id)  # % _user may be a fix? not tested
     except UserAlreadyRegistered:
         pass
     print(f"{member.name} just joined the server!")
