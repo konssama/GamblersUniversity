@@ -54,7 +54,7 @@ async def on_member_join(member: discord.member.Member):
 
 @tasks.loop(hours=1)
 async def refresh_user_id():
-    """Keeps the names updated if someone changes it and fixed the ids in case the database gets damaged."""
+    """Keeps the names updated if someone changes it and fixes the ids in case the database gets damaged."""
 
     ids = get_all_ids()
     for id in ids:
