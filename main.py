@@ -8,15 +8,15 @@ import discord
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
-from classes.menus import BuyMenu
-from classes.sheets import (
+from library.menus import BuyMenu
+from library.sheets import (
     generate_call_queues,
     pop_get_queue,
     push_set_queue,
     get_all_ids,
 )
-from classes.time_module import get_timestamp, schedule_time, calc_time_difference
-from classes.user import (
+from library.time_module import get_timestamp, schedule_time, calc_time_difference
+from library.user import (
     UserAlreadyRegistered,
     generate_user_objects,
     get_user,
@@ -60,6 +60,8 @@ async def on_member_join(member: discord.member.Member):
 
 @tasks.loop(hours=1)
 async def refresh_user_id():
+    """Keeps the names updated if someone changes it and fixed the ids in case the database gets damaged."""
+
     ids = get_all_ids()
     for id in ids:
         discord_obj = bot.get_user(id)
@@ -73,6 +75,8 @@ async def refresh_user_id():
 
         python_obj = get_user(id)
 
+        python_obj.user_id = discord_obj.id  # same value but ig update it
+        python_obj.name = discord_obj.name
         python_obj.id_cell.next_value(discord_obj.id)
         python_obj.name_cell.next_value(discord_obj.name)
 

@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime
 import pytz
 
 tz = pytz.timezone("Europe/Athens")

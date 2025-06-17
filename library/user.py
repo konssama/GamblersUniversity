@@ -1,5 +1,5 @@
-from classes.sheets import CCell, get_all_ids, push_set_queue
-from classes.time_module import get_timestamp
+from library.sheets import CCell, get_all_ids, push_set_queue
+from library.time_module import get_timestamp
 
 
 class User:
@@ -49,9 +49,10 @@ class User:
         self.id_cell = CCell("int", row, 1)
 
         self.name_cell = CCell("str", row, 2)
-        self.balance = CCell("float", row, 3)
-        self.last_cashout = CCell("datetime", row, 4)
-        self.gpu_count = CCell("int", row, 5)
+        self.last_activity = CCell("datetime", row, 3)
+        self.balance = CCell("float", row, 4)
+        self.last_cashout = CCell("datetime", row, 5)
+        self.gpu_count = CCell("int", row, 6)
 
         if is_new:
             self.id_cell.next_value(user_id)
@@ -60,8 +61,10 @@ class User:
             self.name = user_name
             self.name_cell.next_value(user_name)
 
+            now = get_timestamp()
+            self.last_activity.next_value(now)
             self.balance.next_value(0)
-            self.last_cashout.next_value(get_timestamp())
+            self.last_cashout.next_value(now)
             self.gpu_count.next_value(1)
             push_set_queue()
         else:  # if we have a set name save it in memory since it's not going to change much

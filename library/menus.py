@@ -1,7 +1,7 @@
 import discord
-from classes.user import User
-from classes.sheets import pop_get_queue, push_set_queue
-from classes.abstract_menus import IntegerButtonView
+from library.user import User
+from library.sheets import pop_get_queue, push_set_queue
+from library.abstract_menus import IntegerButtonView
 
 
 class BuyMenu(discord.ui.View):
