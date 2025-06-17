@@ -128,7 +128,6 @@ async def cashout(interaction: discord.Interaction):
 
     gain = round(diff * gpu_count * 0.06, 2)
     current_balance += gain
-    current_balance = round(current_balance, 2)
 
     user.balance.next_value(current_balance)
     user.last_cashout.next_value(new_time)

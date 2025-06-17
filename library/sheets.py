@@ -87,7 +87,7 @@ def push_set_queue():
 
     batch_data = []
     for row, col, value in _set_queue:
-        if value is float:  # !FIXME does not work
+        if isinstance(value, float):
             value = round(value, 2)
 
         new_dict = {
