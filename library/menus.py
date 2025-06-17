@@ -58,6 +58,7 @@ class GpuMenu(IntegerButtonView):
 
         gpus += amount
         current_balance -= gpu_price * amount
+        current_balance = round(current_balance, 2)
 
         if gpus > 10:
             # return without pushing to database
