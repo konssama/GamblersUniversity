@@ -4,7 +4,6 @@ import time
 
 import discord
 
-# from discord import app_commands
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
@@ -51,12 +50,6 @@ async def on_member_join(member: discord.member.Member):
     except UserAlreadyRegistered:
         pass
     print(f"{member.name} just joined the server!")
-
-
-# @bot.event
-# async def on_message(msg:discord.message.Message):
-#     if msg.author.id != bot.user.id:
-#         await msg.channel.send(f"yes {msg.author.mention}")
 
 
 @tasks.loop(hours=1)
