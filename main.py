@@ -9,7 +9,12 @@ from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 from classes.menus import BuyMenu
-from classes.sheets import generate_call_queues, pop_get_queue, push_set_queue
+from classes.sheets import (
+    generate_call_queues,
+    pop_get_queue,
+    push_set_queue,
+    get_all_ids,
+)
 from classes.time_module import get_timestamp, schedule_time, calc_time_difference
 from classes.user import (
     UserAlreadyRegistered,
@@ -32,7 +37,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     await bot.tree.sync()  # show bot / commands to the server commands
 
-    # daily_task.start()
+    refresh_user_id.start()
 
     print(f"{bot.user} is online")
 
@@ -40,7 +45,7 @@ async def on_ready():
 @bot.event
 async def on_member_join(member: discord.member.Member):
     try:  # !FIXME need to add members intent in the discord developers website
-        register_user(member.id)
+        register_user(member.id, member.name)
         # register_user(member._user.id)  # % _user may be a fix? not tested
     except UserAlreadyRegistered:
         pass
@@ -53,12 +58,26 @@ async def on_member_join(member: discord.member.Member):
 #         await msg.channel.send(f"yes {msg.author.mention}")
 
 
-# @tasks.loop(time=schedule_time(13, 34))
-# async def daily_task():
-#     print(f"Daily task executed at {get_timestamp()}")
-#     channel = bot.get_channel("id_int_removed")
-#     if channel:
-#         await channel.send("msg")
+@tasks.loop(hours=1)
+async def refresh_user_id():
+    ids = get_all_ids()
+    for id in ids:
+        discord_obj = bot.get_user(id)
+        if discord_obj is None:
+            # if the user is not in discord's cache try fetching it form the server
+            try:
+                discord_obj = await bot.fetch_user(id)
+            except discord.NotFound:
+                print(f"User of id {id} was not found in discord")
+                continue
+
+        python_obj = get_user(id)
+
+        python_obj.id_cell.next_value(discord_obj.id)
+        python_obj.name_cell.next_value(discord_obj.name)
+
+    push_set_queue()
+    print("User IDs and names were refreshed")
 
 
 @bot.tree.command(
@@ -69,7 +88,7 @@ async def register(interaction: discord.Interaction):
     await interaction.response.defer()
 
     try:
-        register_user(interaction.user.id)
+        register_user(interaction.user.id, interaction.user.name)
         await interaction.followup.send(
             f"Οκ τώρα είσαι αποθηκευμένος {interaction.user.mention}"
         )

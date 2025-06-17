@@ -58,6 +58,9 @@ def generate_call_queues():
 
 
 def pop_get_queue() -> list:
+    if len(_get_queue) == 0:
+        return
+
     cells: list[str] = []  # cell coords in C9 format
     types: list[str] = []  # type[i] is the intended type for cells[i]
 
@@ -79,6 +82,9 @@ def pop_get_queue() -> list:
 
 
 def push_set_queue():
+    if len(_set_queue) == 0:
+        return
+
     batch_data = []
     for row, col, value in _set_queue:
         if value is float:
