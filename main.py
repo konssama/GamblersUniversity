@@ -175,7 +175,7 @@ async def buy(interaction: discord.Interaction):
 async def leaderboard(interaction: discord.Interaction):
     await interaction.response.defer()
 
-    users = get_all_users_sorted()
+    users = get_all_users_sorted(key="balance")
     for user in users:
         user.balance.queue_value()
 
