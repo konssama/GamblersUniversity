@@ -1,5 +1,5 @@
 from library.sheets import CCell, get_all_ids, push_set_queue, pop_get_queue
-from library.time_module import get_timestamp
+from library.time_module import get_timestamp, calc_time_difference
 
 
 class User:
@@ -98,6 +98,22 @@ def get_user(key_id: int) -> User:
 
 def get_all_users() -> list[User]:
     return _all_users
+
+
+def get_active_users() -> list[User]:
+    users = get_all_users()
+    for user in users:
+        user.last_activity.queue_value()
+
+    activity_times = pop_get_queue()
+    now = get_timestamp()
+    active_users = []
+
+    for i in range(len(users)):
+        if calc_time_difference(activity_times[i], now) <= 2:
+            active_users.append(users[i])
+
+    return active_users
 
 
 def get_all_users_sorted(key: str) -> list[User]:

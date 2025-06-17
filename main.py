@@ -12,7 +12,6 @@ from library.sheets import (
     generate_call_queues,
     pop_get_queue,
     push_set_queue,
-    get_all_ids,
 )
 from library.time_module import get_timestamp, schedule_time, calc_time_difference
 from library.user import (
@@ -21,6 +20,7 @@ from library.user import (
     get_user,
     register_user,
     get_all_users_sorted,
+    get_all_users,
 )
 
 load_dotenv()
@@ -56,21 +56,23 @@ async def on_member_join(member: discord.member.Member):
 async def refresh_user_id():
     """Keeps the names updated if someone changes it and fixes the ids in case the database gets damaged."""
 
-    ids = get_all_ids()
-    for id in ids:
-        discord_obj = bot.get_user(id)
+    users = get_all_users()
+    for python_obj in users:
+        discord_obj = bot.get_user(python_obj.user_id)
         if discord_obj is None:
             # if the user is not in discord's cache try fetching it form the server
             try:
-                discord_obj = await bot.fetch_user(id)
+                discord_obj = await bot.fetch_user(python_obj.user_id)
             except discord.NotFound:
-                print(f"User of id {id} was not found in discord")
+                print(
+                    f"User of id {python_obj.user_id}, supposed name {python_obj.name} was not found in discord"
+                )
                 continue
-
-        python_obj = get_user(id)
 
         python_obj.user_id = discord_obj.id  # same value but ig update it
         python_obj.name = discord_obj.name
+
+        # if database id is wrong the cached id will fix it
         python_obj.id_cell.next_value(discord_obj.id)
         python_obj.name_cell.next_value(discord_obj.name)
 
@@ -124,6 +126,7 @@ async def cashout(interaction: discord.Interaction):
 
     user.balance.next_value(current_balance)
     user.last_cashout.next_value(new_time)
+    user.last_activity.next_value(get_timestamp())
     push_set_queue()
 
     await interaction.followup.send(f"+{gain}€ Σύνολο: {current_balance}€")
@@ -140,20 +143,25 @@ async def coinflip(interaction: discord.Interaction, amount: float):
         return
 
     if random.randrange(0, 2) == 0:
-        user.balance.set(current_balance + amount * 2)
+        user.balance.next_value(current_balance + amount * 2)
         await interaction.followup.send(f"Κέρδισες {amount * 2}€")
     else:
-        user.balance.set(current_balance - amount)
+        user.balance.next_value(current_balance - amount)
         await interaction.followup.send(f"Έχασες {amount}€")
+
+    user.last_activity.next_value(get_timestamp())
+    push_set_queue()
 
 
 @bot.tree.command(name="buy", description="Κάνε αγορές")
 async def buy(interaction: discord.Interaction):
     await interaction.response.defer()
 
+    user = get_user(interaction.user.id)
     embed = discord.Embed(title="Αγορές", description="Μέσο Lidl", color=0x328FF2)
-    view = BuyMenu(get_user(interaction.user.id))
+    view = BuyMenu(user)
 
+    user.last_activity.set(get_timestamp())
     await interaction.followup.send(embed=embed, view=view)
 
 
