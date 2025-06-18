@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
+from library.functions.buy import handle_buy_command, BoughtItemNotFound
 from library.menus import BuyMenu
 from library.sheets import (
     generate_call_queues,
@@ -109,7 +110,7 @@ async def balance(interaction: discord.Interaction):
     await interaction.response.defer()
 
     user = get_user(interaction.user.id)
-    await interaction.followup.send(user.balance.get())
+    await interaction.followup.send(f"Έχεις {user.balance.get()}€")
 
 
 @bot.tree.command(name="cashout", description="Πάρε ό,τι λεφτά έχει μαζέψει το mining")
@@ -159,15 +160,29 @@ async def coinflip(interaction: discord.Interaction, amount: float):
 
 
 @bot.tree.command(name="buy", description="Κάνε αγορές")
-async def buy(interaction: discord.Interaction):
+async def buy(interaction: discord.Interaction, item: str = "", amount: int = -1):
     await interaction.response.defer()
 
     user = get_user(interaction.user.id)
-    embed = discord.Embed(title="Αγορές", description="Μέσο Lidl", color=0x328FF2)
-    view = BuyMenu(user)
-
     user.last_activity.set(get_timestamp())
-    await interaction.followup.send(embed=embed, view=view)
+
+    if item == "":
+        embed = discord.Embed(title="Αγορές", description="Μέσο Lidl", color=0x328FF2)
+        view = BuyMenu(user)
+        await interaction.followup.send(embed=embed, view=view)
+        return  # let the menu handle everything
+
+    if amount <= 0:
+        amount = 1
+    try:
+        msg = handle_buy_command(user, item, amount)
+        color = 0x328FF2
+    except BoughtItemNotFound:
+        msg = f"Τι εννοείς {item};"
+        color = 0xFF0000
+
+    embed = discord.Embed(title=msg, color=color)
+    await interaction.followup.send(embed=embed)
 
 
 @bot.tree.command(name="leaderboard", description="Δες τις κατατάξεις")
