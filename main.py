@@ -14,6 +14,7 @@ from library.sheets import (
     pop_get_queue,
     push_set_queue,
     get_all_ids,
+    new_backup,
 )
 from library.time_module import get_timestamp, schedule_time, calc_time_difference
 from library.user import (
@@ -46,6 +47,7 @@ async def on_ready():
     await bot.tree.sync()  # show bot / commands to the server commands
 
     refresh_user_id.start()
+    keep_backup.start()
 
     print(f"{bot.user} is online")
 
@@ -56,7 +58,16 @@ async def on_member_join(member: discord.member.Member):
         register_user(member.id, member.display_name)
     except UserAlreadyRegistered:
         pass
-    print(f"{member.name} just joined the server!")
+    print(f"{member.display_name} just joined the server!")
+
+
+@tasks.loop(minutes=5)
+async def keep_backup():
+    backup_start = time.time()
+    new_backup()
+    print(
+        f"Created new backup at: {get_timestamp()} and took {time.time() - backup_start:.4f}s"
+    )
 
 
 @tasks.loop(hours=1)
@@ -129,6 +140,7 @@ async def cashout(interaction: discord.Interaction):
 
     gain = round(diff * gpu_count * 0.06, 2)
     current_balance += gain
+    current_balance = round(current_balance, 2)
 
     user.balance.next_value(current_balance)
     user.last_cashout.next_value(new_time)

@@ -28,6 +28,34 @@ DATA: Final = CLIENT.open(SHEET_NAME)
 VARIABLES: Final = DATA.get_worksheet(0)
 
 
+def new_backup():
+    # yes i did have claude do the database backup what about it???
+    if not is_prod:
+        return
+
+    backup = CLIENT.open(SHEET_NAME + "Backup")
+
+    for worksheet in DATA.worksheets(exclude_hidden=True):
+        sheet_name = worksheet.title
+
+        # Get or create corresponding sheet in backup
+        try:
+            backup_worksheet = backup.worksheet(sheet_name)
+            backup_worksheet.clear()
+        except gspread.WorksheetNotFound:
+            # Get dimensions from source worksheet
+            source_rows = worksheet.row_count
+            source_cols = worksheet.col_count
+            backup_worksheet = backup.add_worksheet(
+                sheet_name, source_rows, source_cols
+            )
+
+        # Copy data
+        all_values = worksheet.get_all_values()
+        if all_values:
+            backup_worksheet.update(all_values)
+
+
 def get_all_ids() -> list[str]:
     return VARIABLES.col_values(1)
 
