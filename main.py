@@ -53,7 +53,7 @@ async def on_ready():
 @bot.event
 async def on_member_join(member: discord.member.Member):
     try:
-        register_user(member.id, member.name)
+        register_user(member.id, member.display_name)
     except UserAlreadyRegistered:
         pass
     print(f"{member.name} just joined the server!")
@@ -77,11 +77,11 @@ async def refresh_user_id():
                 continue
 
         python_obj.user_id = discord_obj.id  # same value but ig update it
-        python_obj.name = discord_obj.name
+        python_obj.name = discord_obj.display_name
 
         # if database id is wrong the cached id will fix it
         python_obj.id_cell.next_value(discord_obj.id)
-        python_obj.name_cell.next_value(discord_obj.name)
+        python_obj.name_cell.next_value(discord_obj.display_name)
 
     push_set_queue()
     print("User IDs and names were refreshed")
@@ -95,7 +95,7 @@ async def register(interaction: discord.Interaction):
     await interaction.response.defer()
 
     try:
-        register_user(interaction.user.id, interaction.user.name)
+        register_user(interaction.user.id, interaction.user.display_name)
         await interaction.followup.send(
             f"Οκ τώρα είσαι αποθηκευμένος {interaction.user.mention}"
         )
