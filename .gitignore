@@ -2,6 +2,7 @@ secrets
 secrets/sheets_api.json
 .env
 notes
+.venv
 
 .vscode
 *__pycache__

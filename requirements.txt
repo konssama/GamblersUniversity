@@ -1,0 +1,5 @@
+discord
+dotenv
+gspread
+oauth2client
+pytz
