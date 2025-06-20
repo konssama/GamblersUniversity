@@ -161,7 +161,7 @@ async def coinflip(interaction: discord.Interaction, amount: float):
         return
 
     if random.randrange(0, 2) == 0:
-        user.balance.next_value(current_balance + amount * 2)
+        user.balance.next_value(current_balance + amount)
         await interaction.followup.send(f"Κέρδισες {amount * 2}€")
     else:
         user.balance.next_value(current_balance - amount)
@@ -232,7 +232,7 @@ async def debug_me(interaction: discord.Interaction):
 
 
 @bot.tree.command(name="debug", description="Debug Info")
-@commands.has_role("Admin")
+@commands.has_role("Admin")  # ! i think this doesn't work
 async def debug(interaction: discord.Interaction):
     await interaction.response.send_message("pp")
 
