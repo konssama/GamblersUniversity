@@ -15,6 +15,8 @@ def startBot():
 
 def updateBot():
     killBot()
+    os.system('eval "$(ssh-agent -s)"')
+    os.system("ssh-add github_ssh_key")
     os.system("git fetch origin")
     os.system("git pull origin main")
     print("Bot Updated")
